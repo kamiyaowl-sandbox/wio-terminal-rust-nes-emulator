@@ -7,7 +7,7 @@ edition = "2018"
 [lib]
 path = "src/lib.rs"
 name = "rust_nes_emulator_embedded"
-crate-type = ["cdylib"]
+crate-type = ["staticlib"]
 
 [dependencies.rust-nes-emulator]
 path = "../"

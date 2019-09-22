@@ -1,3 +1,5 @@
+#![crate_type="staticlib"]
+
 extern crate rust_nes_emulator;
 use rust_nes_emulator::prelude::*;
 
@@ -45,8 +47,11 @@ impl Default for EmbeddedEmulator {
 }
 
 #[no_mangle]
-pub extern "C" fn EmbeddedEmulator_new() -> EmbeddedEmulator {
-    EmbeddedEmulator::default()
+pub unsafe extern "C" fn EmbeddedEmulator_init(emu: *mut EmbeddedEmulator) {
+    (*emu).cpu = Cpu::default();
+    (*emu).cpu_sys = System::default();
+    (*emu).ppu = Ppu::default();
+    (*emu).video_sys = VideoSystem::default();
 }
 
 /// エミュレータをリセットします

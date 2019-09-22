@@ -34,12 +34,12 @@ struct EmbeddedEmulator;
 
 extern "C" {
 
+void EmbeddedEmulator_init(EmbeddedEmulator *emu);
+
 /// .nesファイルを読み込みます
 /// `data` - nesファイルのバイナリ
 bool EmbeddedEmulator_load(EmbeddedEmulator *emu,
                            const uint8_t (*binary)[EMBEDDED_EMULATOR_BINARY_SIZE_LIMIT]);
-
-EmbeddedEmulator EmbeddedEmulator_new();
 
 /// エミュレータをリセットします
 /// カセットの中身はリセットしないので実機のリセット相当の処理です
