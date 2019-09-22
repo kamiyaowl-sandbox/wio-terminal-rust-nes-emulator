@@ -3,15 +3,22 @@ name = "rust-nes-emulator-embedded"
 version = "0.1.0"
 authors = ["K <kamiyaowl@gmail.com>"]
 edition = "2018"
+build   = "build.rs"
 
 [dependencies.rust-nes-emulator]
 path = "../"
+
+[build-dependencies]
+bindgen = "0.51"
 
 [dependencies]
 cortex-m = "0.6.0"
 cortex-m-rt = "0.6.8"
 cortex-m-semihosting = "0.3.3"
 panic-halt = "0.2.0"
+
+libc = {version = "0.2.0", default-features = false }
+cty = "0.2.0"
 
 # Uncomment for the panic example.
 # panic-itm = "0.4.1"
