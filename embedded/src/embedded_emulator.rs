@@ -1,6 +1,7 @@
 extern crate rust_nes_emulator;
 use rust_nes_emulator::prelude::*;
 
+#[allow(dead_code)] // TODO: 削除
 #[derive(PartialEq,Eq,Copy,Clone,Debug)]
 pub enum KeyEvent {
     PressA,
@@ -81,6 +82,7 @@ impl EmbeddedEmulator {
         }
     }
     /// キー入力します
+    #[allow(dead_code)] // TODO: 削除
     pub fn update_key(&mut self, key: KeyEvent) {
         match key {
             KeyEvent::PressA      => self.cpu_sys.pad1.push_button(PadButton::A),

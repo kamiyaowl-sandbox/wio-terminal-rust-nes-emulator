@@ -33,10 +33,22 @@ fn print_cpu_info(emu: &EmbeddedEmulator) {
     hprintln!("cpu.p:{:02x}",  emu.cpu.p ).unwrap();
 }
 
+mod c_bindings;
+use c_bindings::*;
 
 #[entry]
 fn main() -> ! {
     hprintln!("### rust-nes-emulator-embedded ###").unwrap();
+    unsafe {
+        let src = HelloStruct{
+            a: 0xff000000,
+            b: 0x00ff0000,
+            c: 0x0000ff00,
+            d: 0x000000ff,
+        };
+        let dst = hello(&src);
+        hprintln!("hello result:{:x}", dst).unwrap();
+    }
 
     let peripherals = stm32f7x9::Peripherals::take().unwrap();
     cortex_m::interrupt::free(|_cs| {
