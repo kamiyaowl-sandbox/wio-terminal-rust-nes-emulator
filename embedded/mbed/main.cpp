@@ -15,7 +15,8 @@ static uint8_t Buffercmp(uint32_t* pBuffer1, uint32_t* pBuffer2, uint16_t Buffer
 uint32_t sdram_aTxBuffer[BUFFER_SIZE];
 uint32_t sdram_aRxBuffer[BUFFER_SIZE];
 
-// EmbeddedEmulator emu;
+typedef struct EmbeddedEmulator EmbeddedEmulator;
+EmbeddedEmulator emu;
 
 int main()
 {

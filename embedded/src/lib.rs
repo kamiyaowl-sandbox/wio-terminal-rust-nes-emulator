@@ -1,5 +1,3 @@
-#![crate_type="staticlib"]
-
 extern crate rust_nes_emulator;
 use rust_nes_emulator::prelude::*;
 
