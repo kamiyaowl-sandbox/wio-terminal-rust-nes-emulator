@@ -20,5 +20,5 @@ Cargo.lock
 **/*.out
 **/BUILD
 
-**/rust_nes_emulator_embedded.a
-**/rust_nes_emulator_embedded.zip
+**/*rust_nes_emulator_embedded.a
+**/*rust_nes_emulator_embedded.zip
