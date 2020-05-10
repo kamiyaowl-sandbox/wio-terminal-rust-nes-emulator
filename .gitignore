@@ -20,4 +20,4 @@ Cargo.lock
 **/*.out
 **/BUILD
 
-# wio_terminal/rust_nes_emulator_for_arduino_lib/src/cortex-m4/librust_nes_emulator_embedded.a
+**/librust_nes_emulator_embedded.a
