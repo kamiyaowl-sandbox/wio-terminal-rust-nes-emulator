@@ -7,7 +7,9 @@
 
 void setup() {
     // for debug
-    Serial.begin(2000000);
+    Serial.begin(9600);
+    while (!Serial) {}
+    Serial.println("*rust-nes-emulator for Wio Terminal*");
 
     // Setup the LCD
     // tft.init();
@@ -20,40 +22,45 @@ void setup() {
     // tft.setCursor(0, 0);
 
     // Setup the Emulator
+    Serial.print("initialize...");
     EmbeddedEmulator_init();
-    if (!EmbeddedEmulator_load()) {
-        Serial.println("Emulator load Error");
-        
+    Serial.println("done");
+
+    Serial.print("rom loading...");
+    if (!EmbeddedEmulator_load()) {       
+        Serial.println("Error");
         // tft.setTextColor(TFT_RED);
         // tft.print("Emulator load Error");        
-        while(1) {}
     }
+    Serial.println("done");
 }
 
 void loop() {
     // emulation
-    uint8_t fb[EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT][EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH][EMBEDDED_EMULATOR_NUM_OF_COLOR];
+    uint8_t fb[240][256][3];
+    Serial.print("do emulation...");
     EmbeddedEmulator_update_screen(&fb);
+    Serial.println("done");
 
     // screen update
     // tft.startWrite();
     Serial.println("==========");
 
-    for(uint8_t j = 0 ; j < EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT ; ++j) {
-        for(uint8_t i = 0 ; i < EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH ; ++i) {
-            const uint8_t r = fb[j][i][0];
-            const uint8_t g = fb[j][i][1];
-            const uint8_t b = fb[j][i][2];
-            if (r != 0 || g != 0 || b != 0) {
-                Serial.println(".");
-            } else {
-                Serial.println(" ");
-            }
-            // const uint16_t color = (r << 11) | (g << 5) | b; // { r[15:11], g[10:5], b[4:0] }
-            // tft.drawPixel(i, j, color);
-        }
-        Serial.println(".");
-    }
+    // for(uint8_t j = 0 ; j < EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT ; ++j) {
+    //     for(uint8_t i = 0 ; i < EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH ; ++i) {
+    //         const uint8_t r = fb[j][i][0];
+    //         const uint8_t g = fb[j][i][1];
+    //         const uint8_t b = fb[j][i][2];
+    //         if (r != 0 || g != 0 || b != 0) {
+    //             Serial.print(".");
+    //         } else {
+    //             Serial.print(" ");
+    //         }
+    //         // const uint16_t color = (r << 11) | (g << 5) | b; // { r[15:11], g[10:5], b[4:0] }
+    //         // tft.drawPixel(i, j, color);
+    //     }
+    //     Serial.println(".");
+    // }
     // tft.endWrite();
 }
 
