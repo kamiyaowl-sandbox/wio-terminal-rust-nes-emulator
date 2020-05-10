@@ -3,6 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\user\\AppData\\Local\\Arduino15\\packages\\Seeeduino\\tools\\**",
+                "C:\\Users\\user\\AppData\\Local\\Arduino15\\packages\\Seeeduino\\hardware\\samd\\1.7.3\\**",
                 "${workspaceFolder}/**"
             ],
             "defines": [
@@ -14,7 +16,10 @@
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.20.27508/bin/Hostx64/x64/cl.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "${default}"
+            "intelliSenseMode": "${default}",
+            "forcedInclude": [
+                "C:\\Users\\user\\AppData\\Local\\Arduino15\\packages\\Seeeduino\\hardware\\samd\\1.7.3\\cores\\arduino\\Arduino.h"
+            ]
         }
     ],
     "version": 4

@@ -1,0 +1,7 @@
+{
+    "port": "COM10",
+    "board": "Seeeduino:samd:seeed_wio_terminal",
+    "configuration": "cache=on,speed=120,opt=small,maxqspi=50,usbstack=arduino,debug=off",
+    "programmer": "AVRISP mkII",
+    "sketch": "wio_terminal\\wio_terminal.ino"
+}
