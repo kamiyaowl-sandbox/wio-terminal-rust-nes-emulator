@@ -36,8 +36,9 @@ void setup() {
 }
 
 void loop() {
+    uint8_t fb[EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT][EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH][EMBEDDED_EMULATOR_NUM_OF_COLOR];
+    
     // emulation
-    uint8_t fb[240][256][3];
     Serial.print("do emulation...");
     EmbeddedEmulator_update_screen(&fb);
     Serial.println("done");
