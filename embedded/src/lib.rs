@@ -81,8 +81,8 @@ pub unsafe extern "C" fn EmbeddedEmulator_reset() {
 /// `data` - nesファイルのバイナリ
 #[no_mangle]
 pub unsafe extern "C" fn EmbeddedEmulator_load() -> bool {
-    // let binary = include_bytes!("../../roms/other/hello.nes");
-    let binary = include_bytes!("../../roms/my_dump/mario.nes");
+    let binary = include_bytes!("../../roms/other/hello.nes");
+    // let binary = include_bytes!("../../roms/my_dump/mario.nes");
 
     if let Some(ref mut emu) = EMULATOR {
         let success = emu
@@ -112,6 +112,32 @@ pub unsafe extern "C" fn EmbeddedEmulator_update_screen(
                 emu.cpu.interrupt(&mut emu.cpu_sys, interrupt);
             }
             total_cycle = total_cycle + cpu_cycle;
+        }
+    }
+}
+
+/// 描画領域1面分更新します
+#[no_mangle]
+pub unsafe extern "C" fn EmbeddedEmulator_get_next_line_ptr() -> usize {
+    if let Some(ref emu) = EMULATOR {
+        emu.ppu.get_next_line_ptr()
+    } else {
+        0
+    }
+}
+
+/// 描画領域1面分更新します
+#[no_mangle]
+pub unsafe extern "C" fn EmbeddedEmulator_update_line(
+    fb_line: &mut [[u8; EMBEDDED_EMULATOR_NUM_OF_COLOR]; EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH],
+) {
+    if let Some(ref mut emu) = EMULATOR {
+        let origin_fb_index = emu.ppu.get_next_line_ptr();
+        while origin_fb_index == emu.ppu.get_next_line_ptr() {
+            let cpu_cycle = usize::from(emu.cpu.step(&mut emu.cpu_sys));
+            if let Some(interrupt) = emu.ppu.step_line(cpu_cycle, &mut emu.cpu_sys, fb_line) {
+                emu.cpu.interrupt(&mut emu.cpu_sys, interrupt);
+            }
         }
     }
 }

@@ -24,8 +24,7 @@ pub const SCREEN_TILE_HEIGHT: u16 = (VISIBLE_SCREEN_HEIGHT as u16) / PIXEL_PER_T
 /// 1属性テーブルエントリに対する横, 縦タイル数
 pub const BG_NUM_OF_TILE_PER_ATTRIBUTE_TABLE_ENTRY: u16 = 4;
 /// 属性テーブルの横エントリ数 8
-pub const ATTRIBUTE_TABLE_WIDTH: u16 =
-    SCREEN_TILE_WIDTH / BG_NUM_OF_TILE_PER_ATTRIBUTE_TABLE_ENTRY;
+pub const ATTRIBUTE_TABLE_WIDTH: u16 = SCREEN_TILE_WIDTH / BG_NUM_OF_TILE_PER_ATTRIBUTE_TABLE_ENTRY;
 
 /// PPU内部のOAMの容量 dmaの転送サイズと等しい
 pub const OAM_SIZE: usize = 0x100;
@@ -694,15 +693,10 @@ impl Ppu {
             None
         }
     }
-    /// stepで渡すfb_lineのline_numberを取得します
-    pub fn get_next_line_ptr(&self) -> Option<usize> {
+    /// 次に描画する水平位置を取得します
+    pub fn get_next_line_ptr(&self) -> usize {
         // self.current_lineは次書くべきline numがそのまま入ってる
-        let line = usize::from(self.current_line);
-        if line < VISIBLE_SCREEN_HEIGHT {
-            Some(line)
-        } else {
-            None
-        }
+        usize::from(self.current_line)
     }
 
     pub fn step(
@@ -711,7 +705,8 @@ impl Ppu {
         system: &mut System,
         fb: &mut [[[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH]; VISIBLE_SCREEN_HEIGHT],
     ) -> Option<Interrupt> {
-        if let Some(index) = self.get_next_line_ptr() {
+        let index = self.get_next_line_ptr();
+        if index < VISIBLE_SCREEN_HEIGHT {
             self.step_line(cpu_cyc, system, &mut fb[index])
         } else {
             let mut fb_dummy = [[0; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH];

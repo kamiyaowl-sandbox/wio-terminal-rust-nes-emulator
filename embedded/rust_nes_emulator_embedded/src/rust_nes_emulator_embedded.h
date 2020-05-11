@@ -30,6 +30,9 @@ enum class KeyEvent : uint8_t {
 
 extern "C" {
 
+/// 描画領域1面分更新します
+uintptr_t EmbeddedEmulator_get_next_line_ptr();
+
 void EmbeddedEmulator_init();
 
 /// .nesファイルを読み込みます
@@ -42,6 +45,9 @@ void EmbeddedEmulator_reset();
 
 /// キー入力します
 void EmbeddedEmulator_update_key(KeyEvent key);
+
+/// 描画領域1面分更新します
+void EmbeddedEmulator_update_line(uint8_t (*fb_line)[EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH][EMBEDDED_EMULATOR_NUM_OF_COLOR]);
 
 /// 描画領域1面分更新します
 void EmbeddedEmulator_update_screen(uint8_t (*fb)[EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT][EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH][EMBEDDED_EMULATOR_NUM_OF_COLOR]);
