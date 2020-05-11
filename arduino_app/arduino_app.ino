@@ -49,8 +49,8 @@ void loop() {
             const uint8_t r = fb_line[i][0];
             const uint8_t g = fb_line[i][1];
             const uint8_t b = fb_line[i][2];
-            if (r != 0 || g != 0 || b != 0) {
-                Serial.print(".");
+            if (r > 0x80 || g > 0x80 || b > 0x80) {
+                Serial.print("#");
             } else {
                 Serial.print(" ");
             }
