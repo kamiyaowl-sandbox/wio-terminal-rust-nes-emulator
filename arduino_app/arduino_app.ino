@@ -36,32 +36,29 @@ void setup() {
 }
 
 void loop() {
-    uint8_t fb[EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT][EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH][EMBEDDED_EMULATOR_NUM_OF_COLOR];
+    uint8_t fb_line[EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH][EMBEDDED_EMULATOR_NUM_OF_COLOR];
     
     // emulation
-    Serial.print("do emulation...");
-    EmbeddedEmulator_update_screen(&fb);
-    Serial.println("done");
+    const uint8_t currentY = (uint8_t)EmbeddedEmulator_get_next_line_ptr(); // 次のLine位置
+    EmbeddedEmulator_update_line(&fb_line);
 
     // screen update
     // tft.startWrite();
-    Serial.println("==========");
-
-    // for(uint8_t j = 0 ; j < EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT ; ++j) {
-    //     for(uint8_t i = 0 ; i < EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH ; ++i) {
-    //         const uint8_t r = fb[j][i][0];
-    //         const uint8_t g = fb[j][i][1];
-    //         const uint8_t b = fb[j][i][2];
-    //         if (r != 0 || g != 0 || b != 0) {
-    //             Serial.print(".");
-    //         } else {
-    //             Serial.print(" ");
-    //         }
-    //         // const uint16_t color = (r << 11) | (g << 5) | b; // { r[15:11], g[10:5], b[4:0] }
-    //         // tft.drawPixel(i, j, color);
-    //     }
-    //     Serial.println(".");
-    // }
+    if (currentY < EMBEDDED_EMULATOR_VISIBLE_SCREEN_HEIGHT) { // blank期間は書かなくて良い
+        for(uint32_t i = 0 ; i < EMBEDDED_EMULATOR_VISIBLE_SCREEN_WIDTH ; ++i) {
+            const uint8_t r = fb_line[i][0];
+            const uint8_t g = fb_line[i][1];
+            const uint8_t b = fb_line[i][2];
+            if (r != 0 || g != 0 || b != 0) {
+                Serial.print(".");
+            } else {
+                Serial.print(" ");
+            }
+            // const uint16_t color = (r << 11) | (g << 5) | b; // { r[15:11], g[10:5], b[4:0] }
+            // tft.drawPixel(i, j, color);
+        }
+    }
+    Serial.println("");
     // tft.endWrite();
 }
 
