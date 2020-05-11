@@ -4,7 +4,7 @@ use super::system::*;
 use super::video_system::*;
 
 /// 1lineあたりかかるCPUサイクル
-pub const CPU_CYCLE_PER_LINE: usize = (341 / 3); // ppu cyc -> cpu cyc
+pub const CPU_CYCLE_PER_LINE: usize = 341 / 3; // ppu cyc -> cpu cyc
 /// 色の種類(RGB)
 pub const NUM_OF_COLOR: usize = 3;
 /// ユーザーに表示される領域幅
@@ -25,7 +25,7 @@ pub const SCREEN_TILE_HEIGHT: u16 = (VISIBLE_SCREEN_HEIGHT as u16) / PIXEL_PER_T
 pub const BG_NUM_OF_TILE_PER_ATTRIBUTE_TABLE_ENTRY: u16 = 4;
 /// 属性テーブルの横エントリ数 8
 pub const ATTRIBUTE_TABLE_WIDTH: u16 =
-    (SCREEN_TILE_WIDTH / BG_NUM_OF_TILE_PER_ATTRIBUTE_TABLE_ENTRY);
+    SCREEN_TILE_WIDTH / BG_NUM_OF_TILE_PER_ATTRIBUTE_TABLE_ENTRY;
 
 /// PPU内部のOAMの容量 dmaの転送サイズと等しい
 pub const OAM_SIZE: usize = 0x100;
@@ -294,7 +294,7 @@ impl Ppu {
     fn draw_line(
         &mut self,
         system: &mut System,
-        fb: &mut [[[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH]; VISIBLE_SCREEN_HEIGHT],
+        fb_line: &mut [[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH],
     ) {
         // ループ内で何度も呼び出すとパフォーマンスが下がる
         let nametable_base_addr = system.read_ppu_name_table_base_addr();
@@ -402,19 +402,19 @@ impl Ppu {
                 }
             }
             // データをFBに反映
-            fb[pixel_y][pixel_x][0] = draw_color.0;
-            fb[pixel_y][pixel_x][1] = draw_color.1;
-            fb[pixel_y][pixel_x][2] = draw_color.2;
+            fb_line[pixel_x][0] = draw_color.0;
+            fb_line[pixel_x][1] = draw_color.1;
+            fb_line[pixel_x][2] = draw_color.2;
 
             // モノクロ出力対応(とりあえず総加平均...)
             if is_monochrome {
-                let data = ((u16::from(fb[pixel_y][pixel_x][0])
-                    + u16::from(fb[pixel_y][pixel_x][1])
-                    + u16::from(fb[pixel_y][pixel_x][2]))
+                let data = ((u16::from(fb_line[pixel_x][0])
+                    + u16::from(fb_line[pixel_x][1])
+                    + u16::from(fb_line[pixel_x][2]))
                     / 3) as u8;
-                fb[pixel_y][pixel_x][0] = data;
-                fb[pixel_y][pixel_x][1] = data;
-                fb[pixel_y][pixel_x][2] = data;
+                fb_line[pixel_x][0] = data;
+                fb_line[pixel_x][1] = data;
+                fb_line[pixel_x][2] = data;
             }
         }
     }
@@ -581,7 +581,7 @@ impl Ppu {
     fn update_line(
         &mut self,
         system: &mut System,
-        fb: &mut [[[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH]; VISIBLE_SCREEN_HEIGHT],
+        fb_line: &mut [[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH],
     ) -> Option<Interrupt> {
         // scroll更新
         self.current_scroll_x = self.fetch_scroll_x;
@@ -608,7 +608,7 @@ impl Ppu {
                 // sprite探索
                 self.fetch_sprite(system);
                 // 1行描く
-                self.draw_line(system, fb);
+                self.draw_line(system, fb_line);
                 // 行カウンタを更新して終わり
                 self.current_line = (self.current_line + 1) % RENDER_SCREEN_HEIGHT;
 
@@ -646,11 +646,11 @@ impl Ppu {
     /// `system` - レジスタ読み書きする
     /// `video_system` - レジスタ読み書きする
     /// `videoout_func` - pixelごとのデータが決まるごとに呼ぶ(NESは出力ダブルバッファとかない)
-    pub fn step(
+    pub fn step_line(
         &mut self,
         cpu_cyc: usize,
         system: &mut System,
-        fb: &mut [[[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH]; VISIBLE_SCREEN_HEIGHT],
+        fb_line: &mut [[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH],
     ) -> Option<Interrupt> {
         // PPU_SCROLL書き込み
         let (_, scroll_x, scroll_y) = system.read_ppu_scroll();
@@ -688,10 +688,34 @@ impl Ppu {
         let total_cyc = self.cumulative_cpu_cyc + cpu_cyc;
         if total_cyc >= CPU_CYCLE_PER_LINE {
             self.cumulative_cpu_cyc = total_cyc - CPU_CYCLE_PER_LINE;
-            self.update_line(system, fb)
+            self.update_line(system, fb_line)
         } else {
             self.cumulative_cpu_cyc = total_cyc;
             None
+        }
+    }
+    /// stepで渡すfb_lineのline_numberを取得します
+    pub fn get_next_line_ptr(&self) -> Option<usize> {
+        // self.current_lineは次書くべきline numがそのまま入ってる
+        let line = usize::from(self.current_line);
+        if line < VISIBLE_SCREEN_HEIGHT {
+            Some(line)
+        } else {
+            None
+        }
+    }
+
+    pub fn step(
+        &mut self,
+        cpu_cyc: usize,
+        system: &mut System,
+        fb: &mut [[[u8; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH]; VISIBLE_SCREEN_HEIGHT],
+    ) -> Option<Interrupt> {
+        if let Some(index) = self.get_next_line_ptr() {
+            self.step_line(cpu_cyc, system, &mut fb[index])
+        } else {
+            let mut fb_dummy = [[0; NUM_OF_COLOR]; VISIBLE_SCREEN_WIDTH];
+            self.step_line(cpu_cyc, system, &mut fb_dummy)
         }
     }
 }
